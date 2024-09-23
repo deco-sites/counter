@@ -1,0 +1,43 @@
+{
+  "decohub": { "__resolveType": "deco-sites/start/apps/decohub.ts" },
+  "admin-app": {
+    "resolvables": { "__resolveType": "deco-sites/admin/loaders/state.ts" },
+    "__resolveType": "decohub/apps/admin.ts"
+  },
+  "everyone": { "routes": [], "__resolveType": "$live/flags/everyone.ts" },
+  "Home - Start": {
+    "seo": {
+      "type": "website",
+      "image": "https://www.deco.cx/decocx-meta-en.png",
+      "title": "Start by deco.cx",
+      "description": "This is a site template for deco.cx",
+      "titleTemplate": "%s | Start by deco.cx",
+      "descriptionTemplate": "%s | Deco.cx"
+    },
+    "global": [],
+    "routes": [{ "__resolveType": "website/loaders/pages.ts" }],
+    "__resolveType": "deco-sites/start/apps/site.ts"
+  },
+  "pages-home-start-5cae41e3d348": {
+    "name": "Home - Start",
+    "path": "/",
+    "sections": [
+      {
+        "__resolveType": "deco-sites/start/sections/Hero.tsx",
+        "title": "The Mauri Hero!"
+      },
+      {
+        "type": "website",
+        "image": "https://www.deco.cx/decocx-meta-en.png",
+        "title": "Start by deco.cx",
+        "description": "This is a site template for deco.cx",
+        "__resolveType": "website/sections/Seo/Seo.tsx",
+        "titleTemplate": "%s | Start by deco.cx"
+      },
+      { "__resolveType": "deco-sites/start/sections/ParagraphList.tsx" },
+      { "__resolveType": "deco-sites/start/sections/SimpleTextList.tsx" },
+      { "__resolveType": "deco-sites/start/sections/Footer.tsx" }
+    ],
+    "__resolveType": "website/pages/Page.tsx"
+  }
+}

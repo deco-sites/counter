@@ -1,0 +1,34 @@
+{
+  "seo": {
+    "type": "website",
+    "jsonLDs": [],
+    "noIndexing": false,
+    "description": "Improve your page performance with deco.cx",
+    "titleTemplate": "%s | deco.cx",
+    "descriptionTemplate": "%s | deco.cx",
+    "title": "Start",
+    "favicon": "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/8/40cc7da0-93d3-4215-9c2a-04b2f86b0a47",
+    "image": "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/8/22c99167-0018-484f-8b0d-4295a7d771f2"
+  },
+  "global": [
+    {
+      "__resolveType": "htmx/sections/htmx.tsx"
+    }
+  ],
+  "routes": [
+    {
+      "__resolveType": "website/loaders/pages.ts"
+    },
+    {
+      "__resolveType": "website/loaders/redirects.ts"
+    }
+  ],
+  "caching": {
+    "directives": []
+  },
+  "__resolveType": "site/apps/site.ts",
+  "firstByteThresholdMS": true,
+  "theme": {
+    "__resolveType": "Neutral"
+  }
+}
