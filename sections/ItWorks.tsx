@@ -1,4 +1,8 @@
-import { useSection } from "deco/hooks/useSection.ts";
+import { actors } from "@deco/actors/proxy";
+import { SectionProps } from "@deco/deco";
+import { useSection } from "@deco/deco/hooks";
+import { Counter } from "../actors/Counter.ts";
+import { whoAmI } from "../whoami.ts";
 
 export interface Props {
   /**
@@ -7,18 +11,30 @@ export interface Props {
    * @default It Works!
    */
   name?: string;
-
-  count?: number;
+  op?: "decrement" | "increment";
 }
 
-export default function Section({ name = "It Works!", count = 0 }: Props) {
+const counter = actors.proxy({ actor: Counter, server: whoAmI() }).id(
+  "GLOBAL_COUNTER",
+);
+
+export const loader = async (p: Props) => {
+  if (p.op === "decrement") {
+    return { ...p, count: await counter.decrement() };
+  } else if (p.op === "increment") {
+    return { ...p, count: await counter.increment() };
+  }
+  return { ...p, count: await counter.getCount() };
+};
+export default function Section(
+  { name = "It Works!", count }: SectionProps<typeof loader>,
+) {
   /**
    * useSection is a nice hook for getting the HTMX link to render this section,
    * but with the following Props
    */
-  const downLink = useSection({ props: { count: count - 1 } });
-  const upLink = useSection({ props: { count: count + 1 } });
-
+  const downLink = useSection({ props: { op: "decrement" } });
+  const upLink = useSection({ props: { op: "increment" } });
   return (
     <div
       id="it-works"
