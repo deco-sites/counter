@@ -1,8 +1,9 @@
 import { ActorState } from "@deco/actors";
+import { WatchTarget } from "@deco/actors/watch";
 
 export class Counter {
   private count: number;
-  private subscribers: Record<string, (count: number) => void> = {};
+  private watchTarget = new WatchTarget<number>();
 
   constructor(protected state: ActorState) {
     this.count = 0;
@@ -12,14 +13,16 @@ export class Counter {
   }
 
   async increment(): Promise<number> {
-    await this.state.storage.put("counter", ++this.count);
-    this.notifySubscribers();
+    this.count++;
+    await this.state.storage.put("counter", this.count);
+    this.watchTarget.notify(this.count);
     return this.count;
   }
 
   async decrement(): Promise<number> {
-    await this.state.storage.put("counter", --this.count);
-    this.notifySubscribers();
+    this.count--;
+    await this.state.storage.put("counter", this.count);
+    this.watchTarget.notify(this.count);
     return this.count;
   }
 
@@ -28,41 +31,6 @@ export class Counter {
   }
 
   watch(): AsyncIterableIterator<number> {
-    const subscription = crypto.randomUUID();
-    const queue: Array<(value: IteratorResult<number>) => void> = [];
-
-    const pushQueue = (value: IteratorResult<number>) => {
-      queue.forEach((resolve) => resolve(value));
-    };
-
-    const nextPromise = () =>
-      new Promise<IteratorResult<number>>((resolve) => {
-        queue.push(resolve);
-      });
-
-    const iterator: AsyncIterableIterator<number> = {
-      next: () => nextPromise(),
-      return: () => {
-        // Clean up the subscription when iterator.return() is called
-        delete this.subscribers[subscription];
-        // Return the "done" value for the iterator
-        return Promise.resolve({ value: undefined, done: true });
-      },
-      [Symbol.asyncIterator]() {
-        return this;
-      },
-    };
-
-    this.subscribers[subscription] = (count: number) => {
-      pushQueue({ value: count, done: false });
-    };
-
-    return iterator;
-  }
-
-  private notifySubscribers() {
-    Object.values(this.subscribers).forEach((subscriber) =>
-      subscriber(this.count)
-    );
+    return this.watchTarget.subscribe();
   }
 }
