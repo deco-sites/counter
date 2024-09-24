@@ -1,6 +1,6 @@
 import { actors } from "@deco/actors/proxy";
 import { SectionProps } from "@deco/deco";
-import { useSection } from "@deco/deco/hooks";
+import { useScriptAsDataURI, useSection } from "@deco/deco/hooks";
 import { Counter } from "../actors/Counter.ts";
 
 export interface Props {
@@ -13,7 +13,7 @@ export interface Props {
   op?: "decrement" | "increment";
 }
 
-const counter = actors.proxy(Counter).id(
+export const counter = actors.proxy(Counter).id(
   "GLOBAL_COUNTER",
 );
 
@@ -65,7 +65,21 @@ export default function Section(
             </span>
             <span class="loading loading-spinner hidden [.htmx-request_&]:inline" />
           </button>
-          <span>{count}</span>
+          <span id="count">{count}</span>
+          <script
+            type={"module"}
+            src={useScriptAsDataURI((mcount: number) => {
+              const count = document.getElementById("count");
+              const eventSource = new EventSource(
+                `/live/invoke/site/loaders/watchCount.ts`,
+              );
+              eventSource.addEventListener("message", (data) => {
+                if (count && data.data !== `${mcount}`) {
+                  count.innerText = data.data;
+                }
+              });
+            }, count)}
+          />
           <button
             hx-target="#it-works"
             hx-swap="outerHTML"
