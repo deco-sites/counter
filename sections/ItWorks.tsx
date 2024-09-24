@@ -31,7 +31,7 @@ export const loader = async (p: Props) => {
   return { ...p, count };
 };
 export default function Section(
-  { name = "It Works!", count }: SectionProps<typeof loader>,
+  { name = "It Works!", count, op }: SectionProps<typeof loader>,
 ) {
   /**
    * useSection is a nice hook for getting the HTMX link to render this section,
@@ -66,20 +66,6 @@ export default function Section(
             <span class="loading loading-spinner hidden [.htmx-request_&]:inline" />
           </button>
           <span id="count">{count}</span>
-          <script
-            type={"module"}
-            src={useScriptAsDataURI((mcount: number) => {
-              const count = document.getElementById("count");
-              const eventSource = new EventSource(
-                `/live/invoke/site/loaders/watchCount.ts`,
-              );
-              eventSource.addEventListener("message", (data) => {
-                if (count && data.data !== `${mcount}`) {
-                  count.innerText = data.data;
-                }
-              });
-            }, count)}
-          />
           <button
             hx-target="#it-works"
             hx-swap="outerHTML"
@@ -93,6 +79,22 @@ export default function Section(
           </button>
         </div>
         <div class="text-sm">Powered by HTMX</div>
+        {!op && (
+          <script
+            type={"module"}
+            src={useScriptAsDataURI((mcount: number) => {
+              const eventSource = new EventSource(
+                `/live/invoke/site/loaders/watchCount.ts`,
+              );
+              eventSource.addEventListener("message", (data) => {
+                const count = document.getElementById("count");
+                if (count && data.data !== `${mcount}`) {
+                  count.innerText = data.data;
+                }
+              });
+            }, count)}
+          />
+        )}
       </div>
     </div>
   );
