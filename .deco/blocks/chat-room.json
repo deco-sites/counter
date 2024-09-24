@@ -1,0 +1,17 @@
+{
+  "name": "Home",
+  "path": "/chat/:room",
+  "sections": [
+    {
+      "room": {
+        "param": "room",
+        "__resolveType": "website/functions/requestToParam.ts"
+      },
+      "__resolveType": "site/sections/Chat.tsx"
+    },
+    {
+      "__resolveType": "Footer"
+    }
+  ],
+  "__resolveType": "website/pages/Page.tsx"
+}
