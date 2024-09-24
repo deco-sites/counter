@@ -13,15 +13,13 @@ export class Counter {
   }
 
   async increment(): Promise<number> {
-    this.count++;
-    await this.state.storage.put("counter", this.count);
+    await this.state.storage.put("counter", ++this.count);
     this.watchTarget.notify(this.count);
     return this.count;
   }
 
   async decrement(): Promise<number> {
-    this.count--;
-    await this.state.storage.put("counter", this.count);
+    await this.state.storage.put("counter", --this.count);
     this.watchTarget.notify(this.count);
     return this.count;
   }
