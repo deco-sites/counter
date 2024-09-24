@@ -79,3 +79,5 @@ _docker_deps.ts
 .deco/metadata
 
 kv*
+
+.env
