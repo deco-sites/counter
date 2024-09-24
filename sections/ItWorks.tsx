@@ -56,7 +56,8 @@ export default function Section(
           <button
             hx-target="#it-works"
             hx-swap="outerHTML"
-            hx-get={downLink} // htmx link for this section with the down vote props
+            hx-method="POST"
+            hx-post={downLink} // htmx link for this section with the down vote props
             class="btn btn-sm btn-circle btn-outline no-animation"
           >
             <span class="inline [.htmx-request_&]:hidden">
@@ -68,7 +69,7 @@ export default function Section(
           <button
             hx-target="#it-works"
             hx-swap="outerHTML"
-            hx-get={upLink} // htmx link for this section with the up vote props
+            hx-post={upLink} // htmx link for this section with the up vote props
             class="btn btn-sm btn-circle btn-outline no-animation"
           >
             <span class="inline [.htmx-request_&]:hidden">
