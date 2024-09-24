@@ -2,7 +2,6 @@ import { actors } from "@deco/actors/proxy";
 import { SectionProps } from "@deco/deco";
 import { useSection } from "@deco/deco/hooks";
 import { Counter } from "../actors/Counter.ts";
-import { whoAmI } from "../whoami.ts";
 
 export interface Props {
   /**
@@ -14,7 +13,7 @@ export interface Props {
   op?: "decrement" | "increment";
 }
 
-const counter = actors.proxy({ actor: Counter, server: whoAmI() }).id(
+const counter = actors.proxy(Counter).id(
   "GLOBAL_COUNTER",
 );
 
