@@ -23,7 +23,12 @@ export const loader = async (p: Props) => {
   } else if (p.op === "increment") {
     return { ...p, count: await counter.increment() };
   }
-  return { ...p, count: await counter.getCount() };
+  const timeout = new Promise((resolve) => setTimeout(resolve, 5000));
+  const count = await Promise.race([
+    timeout.then(() => -9999999),
+    counter.getCount(),
+  ]);
+  return { ...p, count };
 };
 export default function Section(
   { name = "It Works!", count }: SectionProps<typeof loader>,
