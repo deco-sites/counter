@@ -39,7 +39,7 @@
     "site/": "./",
     "std/": "https://deno.land/std@0.190.0/",
     "@deco/deco": "jsr:@deco/deco@^1.101.19",
-    "@deco/actors": "jsr:@deco/actors@^0.2.7"
+    "@deco/actors": "jsr:@deco/actors@^0.2.8"
   },
   "tasks": {
     "start": "deno run -A --unstable-http --env https://deco.cx/run -- deno task dev",
