@@ -24,6 +24,7 @@ export interface ConnectedUsersEvent extends BaseChatEvent<string[]> {
 }
 
 export type ChatEvent = MessageEvent | TypingEvent | ConnectedUsersEvent;
+
 export class Chat {
   private messages: Message[] = [];
   private events = new WatchTarget<ChatEvent>();
@@ -35,6 +36,7 @@ export class Chat {
       this.messages = await this.state.storage.get<Message[]>("chat") ?? [];
     });
   }
+
   join(user: string) {
     this.users.add(user);
     this.events.notify({
@@ -42,6 +44,7 @@ export class Chat {
       payload: Array.from(this.users),
     });
   }
+
   leave(user: string) {
     this.users.delete(user);
     this.events.notify({
