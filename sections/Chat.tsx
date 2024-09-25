@@ -15,15 +15,20 @@ export const loader = async (p: Props, req: Request) => {
   const url = new URL(req.url);
   const room = p.room;
   const chat = chatService.join(room);
+  const [messages, users] = await Promise.all([
+    chat.getMessages(),
+    chat.getUsers(),
+  ]);
   return {
     ...p,
     user: url.searchParams.get("user") ?? "unknown",
-    messages: await chat.getMessages(),
+    messages,
+    users,
   };
 };
 
 export default function Section(
-  { user = "unknown", messages, room }: SectionProps<typeof loader>,
+  { user = "unknown", messages, room, users }: SectionProps<typeof loader>,
 ) {
-  return <Chat room={room} user={user} messages={messages} />;
+  return <Chat room={room} user={user} users={users} messages={messages} />;
 }

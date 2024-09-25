@@ -1,42 +1,97 @@
 import { useEffect, useState } from "preact/hooks";
-import { Message } from "../actors/Chat.ts";
-import { chat as chatService } from "../actors/client.ts"; // Assuming the `chat` actor is instantiated similarly to `counter`.
+import type { ChatEvent, Message } from "../actors/Chat.ts";
+import { chat as chatservice } from "../actors/client.ts"; // Assuming the `chat` actor is instantiated similarly.
 
 export interface Props {
   user: string;
   room: string;
   messages?: Message[];
+  users?: string[];
 }
 
 export default function ChatComponent(
-  { user, room, messages: initialMessages }: Props,
+  { user, room, messages: initialMessages, users: initialUsers }: Props,
 ) {
-  const chat = chatService.join(room);
+  const chat = chatservice.join(room);
   const [messages, setMessages] = useState<Message[]>(initialMessages ?? []);
+  const [users, setUsers] = useState<string[]>(initialUsers ?? []);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
+  const [typingTimeout, setTypingTimeout] = useState<number | undefined>(
+    undefined,
+  );
 
-  // Watch for new messages
+  const eventHandler: {
+    [E in ChatEvent as E["type"]]: (event: E) => void;
+  } = {
+    "connected-users": (evnt) => {
+      setUsers(evnt.payload);
+    },
+    message: (evnt) => {
+      setMessages(evnt.payload);
+    },
+    typing: (evnt) => {
+      setTypingUser(evnt.payload);
+    },
+  };
+  function handleEvent<E extends ChatEvent>(event: E) {
+    const handler = eventHandler[event.type] as
+      | ((event: E) => void)
+      | undefined;
+    handler?.(event);
+  }
+
   useEffect(() => {
-    const watchMessages = async () => {
-      for await (const updatedMessages of await chat.watch()) {
-        setMessages(updatedMessages); // Update message list when new messages arrive
+    chat.join(user);
+    return () => chat.leave(user);
+  }, [room, user]);
+
+  // Watch for typing events
+  useEffect(() => {
+    const watch = async () => {
+      for await (const event of await chat.watch()) {
+        handleEvent(event);
       }
     };
-    watchMessages();
-  }, []);
+    watch();
+  }, [user]);
+
+  // Detect user typing
+  // deno-lint-ignore no-explicit-any
+  const handleTyping = async (e: any) => {
+    const target = e?.currentTarget?.value;
+    if (!target) {
+      return;
+    }
+    setNewMessage(e.currentTarget.value);
+
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    await chat.setTyping(user, true); // Notify chat actor that the user is typing
+
+    // Set a timeout to stop typing notification after 2 seconds of inactivity
+    const timeout = setTimeout(() => {
+      chat.setTyping(user, false); // Notify chat actor that the user stopped typing
+    }, 2000);
+
+    setTypingTimeout(timeout);
+  };
 
   // Send a new message
   const sendMessage = async () => {
     if (newMessage.trim() === "") return;
     setIsLoading(true);
     await chat.sendMessage(user, newMessage);
-    setNewMessage(""); // Clear the input after sending
+    setNewMessage("");
     setIsLoading(false);
   };
 
   return (
     <div class="chat-container flex flex-col items-center justify-center p-4 gap-4">
+      <div class="connected-users text-sm">
+        <strong>Connected Users:</strong> {users.join(", ")}
+      </div>
       <div class="chat-box w-full max-w-lg bg-white border rounded-lg p-4">
         <div class="chat-messages flex flex-col gap-2 overflow-y-auto h-64">
           {messages.map((message) => (
@@ -48,13 +103,18 @@ export default function ChatComponent(
             </div>
           ))}
         </div>
+        {typingUser && (
+          <div class="typing-notification text-sm text-gray-500">
+            {typingUser} is typing...
+          </div>
+        )}
       </div>
 
       <div class="message-input w-full max-w-lg flex items-center gap-2">
         <input
           type="text"
           value={newMessage}
-          onInput={(e) => setNewMessage(e.currentTarget.value)}
+          onInput={handleTyping}
           class="input input-bordered w-full"
           placeholder="Type a message..."
           disabled={isLoading}
