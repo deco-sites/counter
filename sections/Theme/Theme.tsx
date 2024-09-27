@@ -5,7 +5,7 @@
  * https://github.com/saadeghi/daisyui/blob/37bca23444bc9e4d304362c14b7088f9a08f1c74/src/docs/src/routes/theme-generator.svelte
  */
 import SiteTheme, { Font } from "apps/website/components/Theme.tsx";
-import Color from "npm:colorjs.io@0.5.2";
+import { default as tinycolor } from "npm:tinycolor2@1.6.0";
 import type { ComponentChildren } from "preact";
 
 export interface ThemeColors {
@@ -142,25 +142,31 @@ type Theme =
   & Button
   & Miscellaneous;
 
+/**
+ * Darkens a color by a percentage
+ */
 const darken = (color: string, percentage: number) =>
-  new Color(color).darken(percentage);
+  tinycolor(color).darken(percentage).toHexString();
 
-const isDark = (c: Color) =>
-  c.contrast("black", "WCAG21") < c.contrast("white", "WCAG21");
-
+/**
+ * Creates a contrasting color by mixing with black or white depending on the lightness of the input color
+ */
 const contrasted = (color: string, percentage = 0.8) => {
-  const c = new Color(color);
-
-  return isDark(c) ? c.mix("white", percentage) : c.mix("black", percentage);
+  const c = tinycolor(color);
+  return c.isDark()
+    ? tinycolor.mix(c, "white", percentage * 100).toHexString()
+    : tinycolor.mix(c, "black", percentage * 100).toHexString();
 };
 
 const toVariables = (
   t: Theme & Required<ThemeColors>,
 ): [string, string][] => {
-  const toValue = (color: string | ReturnType<typeof darken>) => {
-    const [l, c, h] = new Color(color).oklch;
-
-    return `${(l * 100).toFixed(0)}% ${c.toFixed(2)} ${(h || 0).toFixed(0)}deg`;
+  const toValue = (color: string) => {
+    const tc = tinycolor(color);
+    const hsl = tc.toHsl();
+    return `${(hsl.l * 100).toFixed(0)}% ${hsl.s.toFixed(2)} ${
+      (hsl.h || 0).toFixed(0)
+    }deg`;
   };
 
   const colorVariables = Object.entries({
