@@ -11,12 +11,7 @@ export interface Props {
 }
 
 export const loader = async (p: Props) => {
-  const timeout = new Promise((resolve) => setTimeout(resolve, 5000));
-  const count = await Promise.race([
-    timeout.then(() => -9999999),
-    counter.getCount(),
-  ]);
-  return { ...p, count };
+  return { ...p, count: await counter.getCount() };
 };
 
 export default function Section(
