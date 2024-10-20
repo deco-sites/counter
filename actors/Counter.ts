@@ -32,3 +32,5 @@ export class Counter {
     return this.watchTarget.subscribe();
   }
 }
+
+export default Counter;

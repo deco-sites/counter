@@ -1,0 +1,17 @@
+{
+  "name": "Home",
+  "path": "/tictactoe/:room",
+  "sections": [
+    {
+      "room": {
+        "param": "room",
+        "__resolveType": "website/functions/requestToParam.ts"
+      },
+      "__resolveType": "site/sections/TicTacToe.tsx"
+    },
+    {
+      "__resolveType": "Footer"
+    }
+  ],
+  "__resolveType": "website/pages/Page.tsx"
+}

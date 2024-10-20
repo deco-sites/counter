@@ -91,3 +91,5 @@ export class Chat {
     return this.events.subscribe();
   }
 }
+
+export default Chat;

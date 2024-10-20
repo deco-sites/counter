@@ -5,6 +5,7 @@
 import * as $_app from "./routes/_app.tsx";
 import * as $Chat from "./islands/Chat.tsx";
 import * as $ItWorks from "./islands/ItWorks.tsx";
+import * as $TicTacToe from "./islands/TicTacToe.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -14,6 +15,7 @@ const manifest = {
   islands: {
     "./islands/Chat.tsx": $Chat,
     "./islands/ItWorks.tsx": $ItWorks,
+    "./islands/TicTacToe.tsx": $TicTacToe,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
